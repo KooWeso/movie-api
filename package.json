@@ -1,7 +1,7 @@
 {
-  "name": "template-bundle_r-ts-vite_esl-airbnbts-pret-hus-lstage",
-  "private": false,
-  "version": "1.0.0",
+  "name": "movie-api-package",
+  "private": true,
+  "version": "0.0.1",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,6 +12,7 @@
     "prepare": "husky"
   },
   "dependencies": {
+    "antd": "^5.19.3",
     "react": "^18.3.1",
     "react-dom": "^18.3.1"
   },
