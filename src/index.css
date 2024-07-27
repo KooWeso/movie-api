@@ -1,0 +1,20 @@
+*,*::before,*::after{
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+.avatarResponsive {
+  border-radius: 0 !important;
+  flex-shrink: 0;
+  background-color: #f7f7f7;
+  min-width: 60px;
+  min-height: 90px;
+
+}
+@media (min-width: 768px) {
+  .avatarResponsive {
+    min-width: 43.3%;
+    min-height: 300px;
+  }
+}

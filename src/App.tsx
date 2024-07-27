@@ -1,8 +1,29 @@
-import { Button } from 'antd'
-import './App.css'
+import { Flex, Layout } from 'antd'
+import { CSSProperties } from 'react'
+
+import Movies from './components/Movies'
+
+const { Content } = Layout
+
+const pageContentStyle: CSSProperties = {
+  minHeight: '100vh',
+  maxWidth: 1010,
+  padding: '1.5rem',
+  background: '#fff',
+}
 
 function App() {
-  return <Button type="primary">Hello Worlds!</Button>
+  return (
+    <Layout>
+      <Flex justify="center">
+        <Content style={pageContentStyle}>
+          <Flex justify="center">
+            <Movies />
+          </Flex>
+        </Content>
+      </Flex>
+    </Layout>
+  )
 }
 
 export default App
