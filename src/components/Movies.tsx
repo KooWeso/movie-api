@@ -5,10 +5,12 @@ import fetchMoviesData, { MoviesDataType } from '../api/fetchMovies'
 
 import ErrorMessage from './ErrorMessage'
 import MovieCard from './MovieCard'
+import Skelet from './Skelet'
 
 type MoviesStateType = {
   movieData: MoviesDataType | null
   error: Error | null
+  loading: boolean
 }
 
 export default class Movies extends Component<object, MoviesStateType> {
@@ -17,6 +19,7 @@ export default class Movies extends Component<object, MoviesStateType> {
     this.state = {
       movieData: null,
       error: null,
+      loading: true,
     }
   }
 
@@ -26,12 +29,14 @@ export default class Movies extends Component<object, MoviesStateType> {
         this.setState(() => ({
           movieData: data,
           error: null,
+          loading: false,
         }))
       })
       .catch((err) => {
         if (err instanceof Error)
           this.setState(() => ({
             error: err,
+            loading: false,
           }))
       })
 
@@ -39,7 +44,7 @@ export default class Movies extends Component<object, MoviesStateType> {
   }
 
   render() {
-    const { movieData, error } = this.state
+    const { movieData, error, loading } = this.state
 
     console.log('%c Render Movies', 'color:red;')
 
@@ -48,12 +53,21 @@ export default class Movies extends Component<object, MoviesStateType> {
     }
 
     return (
-      <List
-        itemLayout="vertical"
-        grid={{ gutter: 24, column: 2, md: 2, sm: 1, xs: 1 }}
-        dataSource={movieData?.results}
-        renderItem={(item) => <MovieCard movie={item} />}
-      />
+      <>
+        <button type="button" onClick={() => this.setState({ loading: !loading })}>
+          LOADING
+        </button>
+        {!loading ? (
+          <List
+            itemLayout="vertical"
+            grid={{ gutter: 24, column: 2, md: 2, sm: 1, xs: 1 }}
+            dataSource={movieData?.results}
+            renderItem={(item) => <MovieCard movie={item} />}
+          />
+        ) : (
+          <Skelet />
+        )}
+      </>
     )
   }
 }
