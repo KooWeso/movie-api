@@ -57,6 +57,7 @@ export default class Movies extends Component<object, MoviesStateType> {
         <button type="button" onClick={() => this.setState({ loading: !loading })}>
           LOADING
         </button>
+
         {!loading ? (
           <List
             itemLayout="vertical"
