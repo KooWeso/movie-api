@@ -2,7 +2,7 @@ import { Component } from 'react'
 import { Flex, Input, List, Pagination } from 'antd'
 import debounce from 'lodash.debounce'
 
-import fetchMoviesData, { MoviesDataType } from '../api/fetchMovies'
+import { fetchMoviesData, MoviesDataType } from '../api/fetchMovies'
 
 import ErrorMessage from './ErrorMessage'
 import MovieCard from './MovieCard'

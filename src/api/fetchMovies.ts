@@ -1,5 +1,5 @@
 type ParamsType = {
-  query: string
+  query?: string
   page: string
 }
 
@@ -27,6 +27,7 @@ export type MoviesDataType = {
   total_results: number
 }
 const baseURL = new URL('https://api.themoviedb.org/3/search/movie')
+const baseTrendURL = new URL('https://api.themoviedb.org/3/trending/movie/week')
 
 const options = {
   method: 'GET',
@@ -38,23 +39,45 @@ const options = {
   },
 }
 
+const newParams = (prms: ParamsType, bURL: URL) => {
+  const search = new URLSearchParams(prms)
+  const newURL = new URL(bURL)
+  newURL.search = search.toString()
+  return newURL
+}
+
+const handleThrowError = async (res: Response): Promise<Error> => {
+  const errorResponce = (await res.json()) as { status_message: string }
+  throw new Error(`${errorResponce.status_message} ${res.status}`)
+}
+
 const fetchMoviesData = async (query: string, page = 1): Promise<MoviesDataType> => {
   const params: ParamsType = {
     query,
     page: page.toString(),
   }
 
-  const search = new URLSearchParams(params)
-
-  const newURL = new URL(baseURL)
-  newURL.search = search.toString()
+  const newURL = newParams(params, baseURL)
 
   const res = await fetch(newURL, options)
 
   if (!res.ok) {
-    const errorResponce = (await res.json()) as { status_message: string }
-    throw new Error(`${errorResponce.status_message} ${res.status}`)
+    throw await handleThrowError(res)
   } else return res.json() as Promise<MoviesDataType>
 }
 
-export default fetchMoviesData
+const fetchTrendMovies = async (page = 1): Promise<MoviesDataType> => {
+  const params = {
+    page: page.toString(),
+  }
+
+  const newURL = newParams(params, baseTrendURL)
+
+  const res = await fetch(newURL, options)
+
+  if (!res.ok) {
+    throw await handleThrowError(res)
+  } else return res.json() as Promise<MoviesDataType>
+}
+
+export { fetchMoviesData, fetchTrendMovies }
