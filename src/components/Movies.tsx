@@ -1,5 +1,6 @@
 import { Component } from 'react'
-import { List } from 'antd'
+import { Flex, Input, List, Pagination } from 'antd'
+import debounce from 'lodash.debounce'
 
 import fetchMoviesData, { MoviesDataType } from '../api/fetchMovies'
 
@@ -11,20 +12,53 @@ type MoviesStateType = {
   movieData: MoviesDataType | null
   error: Error | null
   loading: boolean
+  searchValue: string
+  page: number
 }
 
 export default class Movies extends Component<object, MoviesStateType> {
-  constructor(props: object) {
-    super(props)
+  debouncedFetch = debounce(() => {
+    const { searchValue, page } = this.state
+    console.log('%c DEBOUNCE', 'color:black;')
+    console.log(`%c ${searchValue}-${page}`, 'color:green;')
+    this.setState(() => ({ loading: true }))
+    this.fetchMoviesDataAndUpdateState(searchValue.trim(), page)
+  }, 500)
+
+  debouncedInputChange = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState(() => ({
+      searchValue: e.target.value,
+    }))
+  }, 1500)
+
+  constructor(_props: object) {
+    super(_props)
     this.state = {
       movieData: null,
       error: null,
       loading: true,
+      searchValue: '',
+      page: 1,
     }
   }
 
   componentDidMount(): void {
-    fetchMoviesData('Adventure time', 1)
+    this.fetchMoviesDataAndUpdateState('chronicl', 1)
+
+    console.log('%c Mounted Movies^', 'color:dodgerblue;')
+  }
+
+  componentDidUpdate(_prevProps: object, prevState: Readonly<MoviesStateType>): void {
+    const { searchValue, page } = this.state
+
+    if ((prevState.searchValue !== searchValue && searchValue.trim()) || prevState.page !== page) {
+      console.log('%c DEBOUNCE TRY', 'color:magenta;')
+      this.debouncedFetch()
+    }
+  }
+
+  fetchMoviesDataAndUpdateState = (title: string, p = 1) => {
+    fetchMoviesData(title, p)
       .then((data) => {
         this.setState(() => ({
           movieData: data,
@@ -39,8 +73,6 @@ export default class Movies extends Component<object, MoviesStateType> {
             loading: false,
           }))
       })
-
-    console.log('%c Mounted Movies^', 'color:dodgerblue;')
   }
 
   render() {
@@ -54,9 +86,19 @@ export default class Movies extends Component<object, MoviesStateType> {
 
     return (
       <>
-        <button type="button" onClick={() => this.setState({ loading: !loading })}>
-          LOADING
-        </button>
+        <Flex vertical gap={16} style={{ marginBottom: '1rem' }}>
+          <button type="button" onClick={() => this.setState({ loading: !loading })}>
+            LOADING
+          </button>
+          <Input
+            placeholder="Type Movie title here..."
+            style={{ borderRadius: 2 }}
+            onChange={(e) => {
+              console.log('INPUT')
+              this.debouncedInputChange(e)
+            }}
+          />
+        </Flex>
 
         {!loading ? (
           <List
@@ -68,25 +110,20 @@ export default class Movies extends Component<object, MoviesStateType> {
         ) : (
           <Skelet />
         )}
+        {movieData ? (
+          <Pagination
+            onChange={(value) => {
+              this.setState(() => ({
+                page: value,
+              }))
+            }}
+            showSizeChanger={false}
+            defaultCurrent={1}
+            total={movieData.total_pages}
+            align="center"
+          />
+        ) : null}
       </>
     )
   }
 }
-
-//     const [movies, setMovies] = useState<MoviesType[]>([])
-
-//   useEffect(() => {
-//     fetchMoviesData('new world', 1)
-//       .then((data) => setMovies(data.results))
-//       .catch((err) => console.error(err))
-//   }, [])
-
-// movies.length &&
-// movies.map(({ poster_path: imgPath, id, title }) => {
-//   return (
-//     <div key={id}>
-//       <img src={`${baseURLImgPath}${imgPath}`} alt={`${title}❌`} />
-//       <p>{title}</p>
-//     </div>
-//   )
-// })

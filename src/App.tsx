@@ -17,7 +17,7 @@ function App() {
     <Layout>
       <Flex justify="center">
         <Content style={pageContentStyle}>
-          <Flex justify="center">
+          <Flex justify="center" vertical>
             <Movies />
           </Flex>
         </Content>

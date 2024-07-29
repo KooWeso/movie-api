@@ -1,5 +1,6 @@
 import { List, Avatar, Typography, Image, Flex, Rate, Progress, Tag } from 'antd'
 import { format } from 'date-fns'
+import { useState } from 'react'
 
 import { MoviesType } from '../api/fetchMovies'
 
@@ -17,6 +18,10 @@ const rateColor = (rate: number) => {
   return '#66E900'
 }
 
+const cutTxt = (length = 0, text = '') => {
+  return text.length > length ? text.substring(0, length).replace(/\s?\w*$/, '...') : text
+}
+
 const baseURLImgPath = 'https://image.tmdb.org/t/p/w500'
 
 function MovieCard({ movie }: MovCdPropType) {
@@ -30,6 +35,10 @@ function MovieCard({ movie }: MovCdPropType) {
     genre_ids: genreIds,
   } = movie
 
+  const [render, setRender] = useState(false)
+
+  console.log(`%c CARD RENDER ${title}`, 'color:green;')
+
   return (
     <List.Item
       style={{
@@ -38,14 +47,19 @@ function MovieCard({ movie }: MovCdPropType) {
       }}
     >
       <Flex gap="1rem">
+        <button type="button" onClick={() => setRender(!render)}>
+          RENDER
+        </button>
         <Avatar
           shape="square"
           className="avatarResponsive"
-          src={<Image src={`${baseURLImgPath}${imgPath || bdImgPath}`} preview fallback="data:image/png;base64" />}
+          src={<Image src={`${baseURLImgPath}${imgPath || bdImgPath}`} preview fallback="/favicon.gif" />}
         />
         <Flex vertical gap=".5rem" style={{ paddingRight: '.5rem', paddingBottom: '1rem', minWidth: 0, flex: 1 }}>
           <Flex align="center" justify="space-between">
-            <Text style={{ fontSize: '1.2rem' }}>{title}</Text>
+            <Text title={title} style={{ fontSize: '1.2rem' }}>
+              {cutTxt(45, title)}
+            </Text>
             <Progress
               type="circle"
               percent={99.99}
@@ -53,7 +67,7 @@ function MovieCard({ movie }: MovCdPropType) {
               strokeWidth={8}
               strokeColor={rateColor(rate)}
               format={() => rate.toFixed(1)}
-              style={{ paddingTop: '.5em', alignSelf: 'flex-start' }}
+              style={{ paddingTop: '.5em', paddingLeft: '.5em', alignSelf: 'flex-start' }}
             />
           </Flex>
 
@@ -66,8 +80,8 @@ function MovieCard({ movie }: MovCdPropType) {
             {!!genreIds.length || <Tag>This movie has no Genres</Tag>}
           </Flex>
           <Flex vertical style={{ marginLeft: window.innerWidth >= 768 ? 0 : -75, flex: 1 }}>
-            <Paragraph ellipsis={{ rows: 4 }} style={{ fontSize: '.9em' }}>
-              {overview || 'This movie has no description to show...'}
+            <Paragraph style={{ fontSize: '.9em' }}>
+              {cutTxt(180, overview) || 'This movie has no description to show...'}
             </Paragraph>
             <Rate allowHalf count={10} style={{ alignSelf: 'flex-end', fontSize: '1rem', marginTop: 'auto' }} />
           </Flex>
