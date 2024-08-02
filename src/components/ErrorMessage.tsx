@@ -26,7 +26,7 @@ function ErrorMessage({ message }: ErrorMessagePropsType) {
             href="https://plainproxies.com/resources/free-web-proxy/#https://movie-api-red-seven.vercel.app/"
             target="_blank"
           >
-            And paste link in this website
+            And paste link into this web proxy
           </Link>
         </>
       }
