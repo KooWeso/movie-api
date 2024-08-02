@@ -22,7 +22,7 @@ function ErrorMessage({ message }: ErrorMessagePropsType) {
           href="https://plainproxies.com/resources/free-web-proxy/#https://movie-api-red-seven.vercel.app/"
           target="_blank"
         >
-          ! copy link of this page ! and acces it throgh THIS LINK that leads to online proxy
+          ! copy link of this page ! and access it throgh THIS LINK that leads to online proxy
         </Link>
       }
     />
