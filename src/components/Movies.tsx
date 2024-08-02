@@ -8,6 +8,17 @@ import SearchTab from './tabs/SearchTab'
 import RatedTab from './tabs/RatedTab'
 
 export default function Movies() {
+
+  const ratedTab = (
+    <SessionConsumer>
+      {({ guestSessionData }) => (
+        <RatingProvider guestSession={guestSessionData}>
+          <RatedTab />
+        </RatingProvider>
+      )}
+    </SessionConsumer>
+  )
+
   const tabs = [
     {
       key: '1',
@@ -21,15 +32,7 @@ export default function Movies() {
     {
       key: '2',
       label: 'Rated',
-      children: (
-        <SessionConsumer>
-          {({ guestSessionData }) => (
-            <RatingProvider guestSession={guestSessionData}>
-              <RatedTab />
-            </RatingProvider>
-          )}
-        </SessionConsumer>
-      ),
+      children: ratedTab,
     },
   ]
 
@@ -38,15 +41,7 @@ export default function Movies() {
       <Tabs
         onChange={(activeKey) => {
           if (activeKey === '2') {
-            tabs[1].children = (
-              <SessionConsumer>
-                {({ guestSessionData }) => (
-                  <RatingProvider guestSession={guestSessionData}>
-                    <RatedTab />
-                  </RatingProvider>
-                )}
-              </SessionConsumer>
-            )
+            tabs[1].children = ratedTab
           } else tabs[1].children = <Empty />
         }}
         defaultActiveKey="1"
