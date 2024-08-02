@@ -18,8 +18,11 @@ function ErrorMessage({ message }: ErrorMessagePropsType) {
       type="error"
       showIcon
       action={
-        <Link href="https://ant.design" target="_blank">
-          Ant Design (Link)
+        <Link
+          href="https://plainproxies.com/resources/free-web-proxy/#https://movie-api-red-seven.vercel.app/"
+          target="_blank"
+        >
+          ! copy link of this page ! and acces it throgh THIS LINK that leads to online proxy
         </Link>
       }
     />

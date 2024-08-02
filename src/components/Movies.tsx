@@ -8,7 +8,6 @@ import SearchTab from './tabs/SearchTab'
 import RatedTab from './tabs/RatedTab'
 
 export default function Movies() {
-
   const ratedTab = (
     <SessionConsumer>
       {({ guestSessionData }) => (
