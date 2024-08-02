@@ -27,8 +27,9 @@ function RatedTab() {
             <Pagination
               onChange={setPage}
               showSizeChanger={false}
+              defaultPageSize={1}
               defaultCurrent={page}
-              total={Number(movieData?.total_pages) * 10}
+              total={Number(movieData?.total_pages) > 500 ? 500 : movieData?.total_pages}
               align="center"
             />
           </>

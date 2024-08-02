@@ -7,8 +7,8 @@ type ErrorMessagePropsType = {
 }
 
 function ErrorMessage({ message }: ErrorMessagePropsType) {
-  const mainMessage = `Error ${message.replace(/\D/g, '')}`
-  const description = message.replace(/\d/g, '')
+  const mainMessage = `Error ${message.slice(-3, message.length)}`
+  const description = message.slice(0, -3)
 
   if (mainMessage === 'Error 404') return <Empty description="Rate at least one movie first" />
 

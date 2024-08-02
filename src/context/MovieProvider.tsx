@@ -38,10 +38,11 @@ type ChildrenType = { children: ReactElement | ReactElement[] | undefined }
 
 class MovieDataProvider extends Component<ChildrenType, MoviesStateType> {
   debouncedSetSearch = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
-    this.setState(() => ({
-      searchValue: e.target.value,
-      loading: true,
-    }))
+    if (e.target.value.trim())
+      this.setState(() => ({
+        searchValue: e.target.value,
+        loading: true,
+      }))
   }, 1500)
 
   constructor(props: ChildrenType) {
