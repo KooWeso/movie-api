@@ -10,7 +10,6 @@ function SearchTab() {
     <MovieDataConsumer>
       {({ debouncedSetSearch, setPage, movieContext: { movieData, loading, error, page } }) => {
         if (error) return <ErrorMessage message={error.message} />
-
         return (
           <>
             <Flex vertical gap={16} style={{ marginBottom: '1rem' }}>
