@@ -6,7 +6,7 @@ type ParamsType = {
 export type MoviesType = {
   adult: boolean
   backdrop_path: string | null
-  genre_ids: number[]
+  genre_ids?: number[]
   id: number
   original_language: string
   original_title: string
@@ -16,7 +16,7 @@ export type MoviesType = {
   release_date: string
   title: string
   video: boolean
-  vote_average: number
+  vote_average?: number
   vote_count: number
 }
 
@@ -26,8 +26,10 @@ export type MoviesDataType = {
   total_pages: number
   total_results: number
 }
+
 const baseURL = new URL('https://api.themoviedb.org/3/search/movie')
 const baseTrendURL = new URL('https://api.themoviedb.org/3/trending/movie/week')
+const baseNewGuestURL = new URL('https://api.themoviedb.org/3/authentication/guest_session/new')
 
 const options = {
   method: 'GET',
@@ -80,4 +82,70 @@ const fetchTrendMovies = async (page = 1): Promise<MoviesDataType> => {
   } else return res.json() as Promise<MoviesDataType>
 }
 
-export { fetchMoviesData, fetchTrendMovies }
+export type GuestSessionDataType = {
+  success: boolean
+  guest_session_id: string
+  expires_at: string
+}
+
+const createGuestSession = async (): Promise<GuestSessionDataType> => {
+  try {
+    const res = await fetch(baseNewGuestURL, options)
+
+    if (!res.ok) {
+      throw await handleThrowError(res)
+    }
+
+    const data = (await res.json()) as Promise<GuestSessionDataType>
+
+    return await data
+  } catch (error) {
+    if (error instanceof Error) {
+      throw new Error(`Guest Session wasn't created! '${error.message}'`)
+    }
+    return Promise.reject(error)
+  }
+}
+
+const fetchRatedMoviesData = async (
+  guestSessionData: GuestSessionDataType | null,
+  page = 1
+): Promise<MoviesDataType> => {
+  const params = {
+    page: page.toString(),
+  }
+
+  try {
+    // guest session existence try
+    if (!guestSessionData) throw new Error('Guest session wasnt found')
+
+    const { guest_session_id: sessionId, success } = guestSessionData
+    // guest session server success try
+    if (!success) throw new Error('Unsuccesfull guest session from server!')
+
+    const baseRatedURL = new URL(`https://api.themoviedb.org/3/guest_session/${sessionId}/rated/movies`)
+
+    const newURL = newParams(params, baseRatedURL)
+    const opt = {
+      method: 'GET',
+      headers: {
+        accept: 'application/json',
+        Authorization:
+          'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJmZDcyNWNkY2NhN2ViMTA0NWQ1MmM2ZWNkMzBlOTVlNiIsIm5iZiI6MTcyMjUwNTk4Ny4xMTQ5NzEsInN1YiI6IjY2OWU0MjJmNzk0ZDFkZjgwYzUwMjI5YiIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.Accj3iZ0aXgp92JYPkeeeQtQH3CDVqPKiV0k0IrfUJQ',
+      },
+    }
+    const res = await fetch(newURL, opt)
+
+    if (!res.ok) {
+      throw await handleThrowError(res)
+    }
+
+    const data = (await res.json()) as Promise<MoviesDataType>
+
+    return await data
+  } catch (error) {
+    return Promise.reject(error)
+  }
+}
+
+export { fetchMoviesData, fetchTrendMovies, createGuestSession, fetchRatedMoviesData }

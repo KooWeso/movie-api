@@ -1,8 +1,11 @@
 import { List, Avatar, Typography, Image, Flex, Rate, Progress, Tag } from 'antd'
 import { format } from 'date-fns'
-import { useState } from 'react'
+
+// import addRating from '../api/addRating'
 
 import { MoviesType } from '../api/fetchMovies'
+import { SessionConsumer } from '../context/SessionProvider'
+import addRating from '../api/addRating'
 
 import GenreTag from './GenreTag'
 
@@ -33,11 +36,8 @@ function MovieCard({ movie }: MovCdPropType) {
     backdrop_path: bdImgPath,
     vote_average: rate,
     genre_ids: genreIds,
+    id,
   } = movie
-
-  const [render, setRender] = useState(false)
-
-  console.log(`%c CARD RENDER ${title}`, 'color:green;')
 
   return (
     <List.Item
@@ -47,9 +47,6 @@ function MovieCard({ movie }: MovCdPropType) {
       }}
     >
       <Flex gap="1rem">
-        <button type="button" onClick={() => setRender(!render)}>
-          RENDER
-        </button>
         <Avatar
           shape="square"
           className="avatarResponsive"
@@ -65,8 +62,8 @@ function MovieCard({ movie }: MovCdPropType) {
               percent={99.99}
               size={30}
               strokeWidth={8}
-              strokeColor={rateColor(rate)}
-              format={() => rate.toFixed(1)}
+              strokeColor={rateColor(rate || 0)}
+              format={() => (rate ? rate.toFixed(1) : -0)}
               style={{ paddingTop: '.5em', paddingLeft: '.5em', alignSelf: 'flex-start' }}
             />
           </Flex>
@@ -77,13 +74,32 @@ function MovieCard({ movie }: MovCdPropType) {
           </Text>
           <Flex wrap gap="4px 0" style={{ minWidth: 0 }}>
             {genreIds && genreIds.map((genreId) => <GenreTag genreId={genreId} key={`genre-${genreId}`} />)}
-            {!!genreIds.length || <Tag>This movie has no Genres</Tag>}
+            {(genreIds && !!genreIds.length) || <Tag>This movie has no Genres</Tag>}
           </Flex>
           <Flex vertical style={{ marginLeft: window.innerWidth >= 768 ? 0 : -75, flex: 1 }}>
             <Paragraph style={{ fontSize: '.9em' }}>
               {cutTxt(180, overview) || 'This movie has no description to show...'}
             </Paragraph>
-            <Rate allowHalf count={10} style={{ alignSelf: 'flex-end', fontSize: '1rem', marginTop: 'auto' }} />
+            <SessionConsumer>
+              {({ guestSessionData, getRateById, setRateById }) => (
+                <Rate
+                  onChange={(value: number) => {
+                    if (guestSessionData)
+                      addRating(guestSessionData.guest_session_id, id, value)
+                        .then(() => {
+                          setRateById(id, value)
+                        })
+                        .catch(() => {
+                          setRateById(id, 0)
+                        })
+                  }}
+                  value={getRateById(id) || 0}
+                  allowHalf
+                  count={10}
+                  style={{ alignSelf: 'flex-end', fontSize: '1rem', marginTop: 'auto' }}
+                />
+              )}
+            </SessionConsumer>
           </Flex>
         </Flex>
       </Flex>

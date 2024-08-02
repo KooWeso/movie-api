@@ -1,4 +1,4 @@
-import { Alert } from 'antd'
+import { Alert, Empty } from 'antd'
 import Link from 'antd/es/typography/Link'
 
 type ErrorMessagePropsType = {
@@ -8,6 +8,8 @@ type ErrorMessagePropsType = {
 function ErrorMessage({ message }: ErrorMessagePropsType) {
   const mainMessage = `Error ${message.replace(/\D/g, '')}`
   const description = message.replace(/\d/g, '')
+
+  if (mainMessage === 'Error 404') return <Empty description="Rate at least one movie first" />
 
   return (
     <Alert

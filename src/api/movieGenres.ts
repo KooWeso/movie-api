@@ -79,13 +79,13 @@ const genres = [
   },
 ]
 
-const pickColor = (genreName: string, index = 0): string | undefined => {
-  const foundColor = colors.find((color) => color[index] === genreName[index].toLocaleLowerCase())
+const pickColor = (genreName: string | undefined, index = 0): string | undefined => {
+  const foundColor = colors.find((color) => color[index] === String(genreName)[index].toLocaleLowerCase())
   if (foundColor) {
     return foundColor
   }
 
-  if (index < genreName.length) return pickColor(genreName, index + 1)
+  if (index < String(genreName).length) return pickColor(genreName, index + 1)
 
   return undefined
 }

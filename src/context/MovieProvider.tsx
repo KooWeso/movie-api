@@ -1,4 +1,5 @@
 import { Component, createContext, ReactElement } from 'react'
+import debounce from 'lodash.debounce'
 
 import { fetchMoviesData, fetchTrendMovies, MoviesDataType } from '../api/fetchMovies'
 
@@ -18,15 +19,31 @@ const initState: MoviesStateType = {
   page: 1,
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const debouncedFunction = debounce((_e: React.ChangeEvent<HTMLInputElement>) => {}, 1500)
+
 type MovieContextType = {
   movieContext: MoviesStateType
+  debouncedSetSearch: typeof debouncedFunction
+  setPage: (value: number) => void
 }
 
-const MovieContext = createContext<MovieContextType>({ movieContext: initState })
+const MovieContext = createContext<MovieContextType>({
+  movieContext: initState,
+  debouncedSetSearch: debounce(() => {}, 1500),
+  setPage: (value) => value,
+})
 
 type ChildrenType = { children: ReactElement | ReactElement[] | undefined }
 
-export class MovieDataProvider extends Component<ChildrenType, MoviesStateType> {
+class MovieDataProvider extends Component<ChildrenType, MoviesStateType> {
+  debouncedSetSearch = debounce((e: React.ChangeEvent<HTMLInputElement>) => {
+    this.setState(() => ({
+      searchValue: e.target.value,
+      loading: true,
+    }))
+  }, 1500)
+
   constructor(props: ChildrenType) {
     super(props)
 
@@ -35,22 +52,31 @@ export class MovieDataProvider extends Component<ChildrenType, MoviesStateType> 
 
   componentDidMount(): void {
     this.updateTrendMovies()
-
-    console.log('%c Mounted Movie PROVIDER^', 'color:dodgerblue;')
   }
 
   componentDidUpdate(_prevProps: object, prevState: Readonly<MoviesStateType>): void {
     const { searchValue, page } = this.state
 
-    console.log('%c UPDATE MOVIE provider', 'color:cyan;')
-    if (prevState.searchValue !== searchValue && searchValue.trim() && prevState.page !== page) {
-      console.log('%c UPDATE MOVIE provider', 'color:teal;')
+    if (
+      (prevState.searchValue !== searchValue && searchValue.trim()) ||
+      (searchValue.trim() && prevState.page !== page)
+    ) {
       this.updateFoundMovies(searchValue, page)
     }
 
-    if (!searchValue.trim() && prevState.page !== page) {
+    if (
+      (!searchValue.trim() && prevState.page !== page) ||
+      (prevState.searchValue !== searchValue && !searchValue.trim())
+    ) {
       this.updateTrendMovies(page)
     }
+  }
+
+  setPage = (value: number) => {
+    this.setState(() => ({
+      page: value,
+      loading: true,
+    }))
   }
 
   updateTrendMovies(p?: number) {
@@ -94,12 +120,20 @@ export class MovieDataProvider extends Component<ChildrenType, MoviesStateType> 
     const { movieData, loading, error, page, searchValue } = this.state
 
     return (
-      // eslint-disable-next-line react/jsx-no-constructed-context-values
-      <MovieContext.Provider value={{ movieContext: { movieData, loading, error, page, searchValue } }}>
+      <MovieContext.Provider
+        // eslint-disable-next-line react/jsx-no-constructed-context-values
+        value={{
+          movieContext: { movieData, loading, error, page, searchValue },
+          debouncedSetSearch: this.debouncedSetSearch,
+          setPage: this.setPage,
+        }}
+      >
         {children}
       </MovieContext.Provider>
     )
   }
 }
+
+export const MovieDataConsumer = MovieContext.Consumer
 
 export default MovieDataProvider
