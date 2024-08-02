@@ -1,5 +1,6 @@
 import { Alert, Empty } from 'antd'
 import Link from 'antd/es/typography/Link'
+import Paragraph from 'antd/es/typography/Paragraph'
 
 type ErrorMessagePropsType = {
   message: string
@@ -18,12 +19,16 @@ function ErrorMessage({ message }: ErrorMessagePropsType) {
       type="error"
       showIcon
       action={
-        <Link
-          href="https://plainproxies.com/resources/free-web-proxy/#https://movie-api-red-seven.vercel.app/"
-          target="_blank"
-        >
-          ! copy link of this page ! and access it throgh THIS LINK that leads to online proxy
-        </Link>
+        <>
+          <Paragraph>Copy link of current page:</Paragraph>
+          <Paragraph copyable>https://movie-api-red-seven.vercel.app/</Paragraph>
+          <Link
+            href="https://plainproxies.com/resources/free-web-proxy/#https://movie-api-red-seven.vercel.app/"
+            target="_blank"
+          >
+            And paste link in this website
+          </Link>
+        </>
       }
     />
   )
