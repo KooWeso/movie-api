@@ -84,14 +84,13 @@ function MovieCard({ movie }: MovCdPropType) {
               {({ guestSessionData, getRateById, setRateById }) => (
                 <Rate
                   onChange={(value: number) => {
-                    if (guestSessionData)
-                      addRating(guestSessionData.guest_session_id, id, value)
-                        .then(() => {
-                          setRateById(id, value)
-                        })
-                        .catch(() => {
-                          setRateById(id, 0)
-                        })
+                    if (guestSessionData) {
+                      setRateById(id, value)
+
+                      addRating(guestSessionData.guest_session_id, id, value).catch(() => {
+                        setRateById(id, 0)
+                      })
+                    }
                   }}
                   value={getRateById(id) || 0}
                   allowHalf
